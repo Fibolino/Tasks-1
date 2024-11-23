@@ -40,9 +40,12 @@ export default function App() {
 
   const showDoneTasksHandler = _ => setShowDoneTasks(!showDoneTasks);
 
-  const itemClickCallback = item => {
-    item.done = !item.done;
-    setTasks([...tasks]);
+  const toggleDone = taskId => {
+    const updatedTasks = tasks.map(task => 
+      task.id === taskId ? { ...task, done: !task.done } : task
+    );
+    setTasks(updatedTasks);
+    AsyncStorage.setItem('tasks', JSON.stringify(updatedTasks));
   };
 
   const deleteTask = id => {
@@ -77,10 +80,9 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      {/* Exibe o modal de adicionar tarefa */}
+     
       {addTask.showAddTasks && <AddTask isVisible={addTask.showAddTasks} onCancel={() => setaddTask({ showAddTasks: false })} onSave={addTasksList} />}
 
-      {/* Exibe o modal de edição, se showEditModal for true */}
       {showEditModal && <EditTask task={selectedTask} onCancel={() => setShowEditModal(false)} onSave={onSaveEditedTask} />}
 
       <ImageBackground source={require('./assets/imgs/today.jpg')} style={styles.background}>
@@ -98,8 +100,8 @@ export default function App() {
       <View style={styles.tasklist}>
         {tasks.map((task, index) => (
           showDoneTasks 
-            ? (task.done && <Task key={index} task={task} itemClickCallback={itemClickCallback} onDelete={deleteTask} onEdit={onEdit} />)
-            : (!task.done && <Task key={index} task={task} itemClickCallback={itemClickCallback} onDelete={deleteTask} onEdit={onEdit} />)
+            ? (task.done && <Task key={index} task={task} toggleDone={toggleDone} onDelete={deleteTask} onEdit={onEdit} />)
+            : (!task.done && <Task key={index} task={task} toggleDone={toggleDone} onDelete={deleteTask} onEdit={onEdit} />)
         ))}
       </View>
 
